@@ -11,8 +11,6 @@ MAIN_DECK = '#main'
 EXTRA_DECK = '#extra'
 SIDE_DECK = '!side'
 
-import json
-
 with open('banlist.json') as f:
     banlist = json.load(f)
 
