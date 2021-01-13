@@ -23,12 +23,14 @@ response = requests.get(YGO_API_ENDPOINT + CARDSET_QUERY + IOC_URI)
 cardSet = response.json()["data"]
 deck = []
 
-f = open("outputdeck.ydk", "a")
+f = open("outputdeck.ydk", "w")
 f.write(RANDOMIZER_TAG)
 f.write(MAIN_DECK)
 for iteration in range(40):
     f.write(str(random.choice(cardSet)["id"]) + '\n')
 f.write(EXTRA_DECK)
 f.write(SIDE_DECK)
+for iteration in range(15):
+    f.write(str(random.choice(cardSet)["id"]) + '\n')
 f.close()
 
