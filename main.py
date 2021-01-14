@@ -18,7 +18,6 @@ SIDE_DECK = '!side\n'
 with open('banlist.json') as f:
     banlist = json.load(f)
 
-#print(banlist["18144506"]) #test some random banned card (harpie's feather duster)
 response = requests.get(YGO_API_ENDPOINT + CARDSET_QUERY + IOC_URI)
 cardSet = response.json()["data"]
 deck = []
