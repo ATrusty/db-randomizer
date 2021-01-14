@@ -24,6 +24,10 @@ ED_ITERS = 15
 with open('banlist.json') as banFile:
     banlist = json.load(banFile)
 
+mainDeck = []
+sideDeck = []
+extraDeck = []
+
 response = requests.get(YGO_API_ENDPOINT + DATE_QUERY)
 cardSet = response.json()["data"]
 
@@ -34,51 +38,62 @@ f = open("outputdeck.ydk", "w")
 f.write(RANDOMIZER_TAG)
 #let's generate the main deck
 f.write(MAIN_DECK)
-while(MD_ITERS > -1):
+while(len(mainDeck) < 40):
     currentCardID = str(random.choice(deckCandidates)["id"])
     if(not currentCardID in banlist.keys()):
-        f.write(currentCardID + '\n')
-        MD_ITERS-=1
-    else:
-        if(banlist[currentCardID] > 0):
-            banlist[currentCardID] = banlist[currentCardID]-1
+        if(mainDeck.count(currentCardID) < 3):
+            mainDeck.append(currentCardID)
             f.write(currentCardID + '\n')
-            MD_ITERS-=1
         else:
+            #we already have 3 of this card, we cannot add it
             pass
-#let's generate the extra deck
-f.write(EXTRA_DECK)
-while(ED_ITERS > -1):
-    currentCardID = str(random.choice(extraDeckCandidates)["id"])
-    if(not currentCardID in banlist.keys()):
-        f.write(currentCardID + '\n')
-        ED_ITERS-=1
     else:
         if(banlist[currentCardID] > 0):
             banlist[currentCardID] = banlist[currentCardID]-1
+            mainDeck.append(currentCardID)
             f.write(currentCardID + '\n')
-            ED_ITERS-=1
         else:
             pass
 
-# for iteration in range(15):
-#     f.write(str(random.choice(extraDeckCandidates)["id"]) + '\n')
+#let's generate the extra deck
+f.write(EXTRA_DECK)
+while(len(extraDeck) < 15):
+    currentCardID = str(random.choice(extraDeckCandidates)["id"])
+    if(not currentCardID in banlist.keys()):
+        if(extraDeck.count(currentCardID) < 3):
+            extraDeck.append(currentCardID)
+            f.write(currentCardID + '\n')
+        else:
+            #we have 3 already in our extra deck, so dont add this in
+            pass
+    else:
+        #we shouldnt need the secondary check here for the 3 card limit because the banlist implementation
+        #should handle that for us
+        if(banlist[currentCardID] > 0):
+            banlist[currentCardID] = banlist[currentCardID]-1
+            extraDeck.append(currentCardID)
+            f.write(currentCardID + '\n')
+        else:
+            pass
+
 #let's generate the side deck
 f.write(SIDE_DECK)
-while(SD_ITERS > -1):
+while(len(sideDeck) < 15):
     currentCardID = str(random.choice(deckCandidates)["id"])
     if(not currentCardID in banlist.keys()):
-        f.write(currentCardID + '\n')
-        SD_ITERS-=1
+        if(mainDeck.count(currentCardID) + sideDeck.count(currentCardID) < 3):
+            sideDeck.append(currentCardID)
+            f.write(currentCardID + '\n')
+        else:
+            #we have 3 already in our side+main deck, so dont add this in
+            pass
     else:
         if(banlist[currentCardID] > 0):
             banlist[currentCardID] = banlist[currentCardID]-1
+            sideDeck.append(currentCardID)
             f.write(currentCardID + '\n')
-            SD_ITERS-=1
         else:
             pass
-# for iteration in range(15):
-#     f.write(str(random.choice(deckCandidates)["id"]) + '\n')
 
 #done
 f.close()
